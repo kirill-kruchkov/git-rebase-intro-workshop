@@ -56,13 +56,44 @@ the right, we value the items on the left more.
 1. You can use `git rebase` with any options for feature branches.
 2. You can't use `cherry-pick`.
 3. You can't commit anything.
-4. Use `git checkout manifesto && git merge --only-ff <feature-branch>` to update the manifesto branch.
+4. Use `./merge.sh <feature-branch>` to update the manifesto branch (let's imagine it's our GitHub 
+   merge PR button). It will automagically switch to the `manifesto` branch before merging.
+
+## Preparation
+
+```
+git checkout master
+chmod +x ./reinit.sh
+chmod +x ./merge.sh
+./reinit.sh
+```
+
 
 ---------------------------------------------------------------------------------------------------
 
 ## Walkthrough
 
 1. Paragraph 1 - Rebase with conflicts
+
+```
+git checkout manifesto
+```
+
+Notice that `paragraph-1` and `manifesto` both contain the `Create manifesto` commit:
+
+```
+git log --graph --pretty=oneline manifesto paragraph-1 
+```
+
+Let's try merging (that's what would normally happen instide the GitHub):
+
+```
+./merge.sh paragraph-1
+```
+
+You'll see a message that fast-forward merge is not possible (due to conflicts). 
+
+Now we can start rebasing. Our goal is to put `paragraph-1` on top of `manifesto`.
 
 ```
 git checkout paragraph-1
@@ -72,7 +103,7 @@ git diff
 # resolve conflicts (accept incoming change)
 git add manifesto.md
 git rebase --continue
-git checkout manifesto && git merge --ff-only paragraph-1
+./merge.sh paragraph-1
 ```
 
 2. Paragraph 2 - Rebase with conflicts, keep both
@@ -85,29 +116,31 @@ git diff
 # resolve conflicts (keep both changes, add an empty line in between)
 git add manifesto.md
 git rebase --continue
-git checkout manifesto && git merge --ff-only paragraph-2
+./merge.sh paragraph-2
 ```
 
 3. Paragraph 3 - Three-argument rebase (--onto)
 
+NB! Don't forget to use `git log --graph --pretty=oneline <branch names>` to see what's going on.
+
 ```
 git checkout paragraph-3
-git log
-# copy previous commit hash
+git log --graph --pretty=oneline manifesto paragraph-3
+# copy previous commit hash (Paragraph 1)
 git rebase --onto manifesto <commit hash> paragraph-3
 git status
 git diff
 # resolve conflicts (keep both changes)
 git add manifesto.md
 git rebase --continue
-git checkout manifesto && git merge --ff-only paragraph-2
+./merge.sh  paragraph-3
 ```
 
 4. Formatting - interactive rebase and squashing
 
 ```
 git checkout formatting
-git log
+git log --graph --pretty=oneline manifesto paragraph-3
 git rebase -i manifesto
 # Drop the first one (Paragraph 2), pick Formatting 1 and squash Formatting 2
 # Then `Esc :wq`
@@ -119,7 +152,9 @@ git rebase --continue
 # resolve conflicts
 git add manifesto.md
 git rebase --continue
-git checkout manifesto && git merge --ff-only formatting
+git log --graph --pretty=oneline manifesto paragraph-3
+git show formatting # or commit hash
+./merge.sh formatting
 ```
 
 
