@@ -61,11 +61,11 @@ the right, we value the items on the left more.
 
 0. Create manifesto
 1. Clean-up
-1. Paragraph 1
-1. Paragraph 2
-1. Paragraph 3
-1. Formatting
-1. Title
+2. Paragraph 1
+3. Paragraph 2
+4. Paragraph 3
+5. Formatting
+6. Title
 
 ## Rules
 
@@ -160,7 +160,7 @@ git checkout manifesto && git merge --ff-only paragraph-3
 
 ```
 git checkout formatting
-git log --graph --pretty=oneline manifesto paragraph-3
+git log --graph --pretty=oneline manifesto formatting
 git rebase -i manifesto
 # Drop the first one (Paragraph 2), pick Formatting 1 and squash Formatting 2.
 # Then `Esc :wq`
@@ -172,7 +172,7 @@ git rebase --continue
 # resolve conflicts
 git add manifesto.md
 git rebase --continue
-git log --graph --pretty=oneline manifesto paragraph-3
+git log --graph --pretty=oneline manifesto formatting
 git show formatting # or commit hash
 git checkout manifesto && git merge --ff-only formatting
 ```
